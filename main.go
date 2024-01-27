@@ -17,17 +17,46 @@ func main() {
 
 	mp := parsing(string(file))
 
-	fmt.Printf("%v", mp)
+	// fmt.Printf("%v", mp)
 
 	th := &treeHeap{}
 	heap.Init(th)
 
+	makeTree(mp,th)
+
+	codes := map[rune]string{}
+
+	rootany := heap.Pop(th)
+	root := rootany.(tree)
+
+	root.preOrder(root.root,codes,"")
+
+	// for k,v:=range codes{
+	// 	fmt.Printf("%v : %v\n",string(k),v)
+	// }
+
+	
+	writeToFile(codes,string(file))
+	fmt.Printf("done")
+}
+
+func parsing(text string) map[rune]int {
+
+	mp := make(map[rune]int)
+	for _, ch := range text {
+		mp[ch]++
+	}
+	return mp
+}
+
+func makeTree(mp map[rune]int,th *treeHeap) {
 	for k, v := range mp {
-		fmt.Printf("%v : %v\n", string(k), v)
 		node := node{
 			frequency: v,
 			val:       k,
 			isLeaf:    true,
+			leftnode: nil,
+			rightnode: nil,
 		}
 
 		tree := tree{
@@ -47,24 +76,46 @@ func main() {
 		node := node{
 			frequency: tree1.root.frequency + tree2.root.frequency,
 			isLeaf:    false,
-		}
-
-		treef := tree{
-			root:      &node,
 			leftnode:  tree1.root,
 			rightnode: tree2.root,
 		}
 
+		treef := tree{
+			root:      &node,
+		}
+
 		heap.Push(th, treef)
 	}
-
 }
 
-func parsing(text string) map[rune]int {
-
-	mp := make(map[rune]int)
-	for _, ch := range text {
-		mp[ch]++
+func writeToFile(codes map[rune]string,oldfile string){
+	file,err:=os.Create("C:/Users/LEGION/Desktop/compressor/output.txt")
+	if err!=nil{
+		fmt.Printf("%v",err)
+		os.Exit(1)
 	}
-	return mp
+	
+	defer file.Close()
+
+	//prepare header
+
+	str:=""
+	str=fmt.Sprintf("%v",len(codes))+" "
+	for k,v:=range codes{
+		str+=string(k)+","+v+" "
+	}
+
+	//payload
+	for _,ch  := range oldfile{
+		fmt.Printf(codes[ch]+"\n")
+		str+=codes[ch]
+	}
+
+	_,err=file.Write([]byte(str))
+	if err!=nil{
+		fmt.Printf("%v",err)
+		os.Exit(1)
+	}
+
+	// fmt.Printf("done")
 }

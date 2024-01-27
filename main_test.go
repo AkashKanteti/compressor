@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/heap"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,6 +13,28 @@ func TestParsing(t *testing.T) {
 	expectedMap := map[rune]int{'a': 1, 'l': 4, ' ': 2, 'i': 1, 's': 1, 'w': 1, 'e': 1}
 	actualMap := parsing(str)
 	assert.Equal(t, expectedMap, actualMap)
+}
+
+func TestTree(t *testing.T) {
+	str := "all is well"
+	mp := parsing(str)
+	th := &treeHeap{}
+	heap.Init(th)
+
+	makeTree(mp,th)
+
+	codes := map[rune]string{}
+
+	rootany := heap.Pop(th)
+	root := rootany.(tree)
+
+	fmt.Printf("%v\n",string(root.root.rightnode.val))
+	root.preOrder(root.root,codes,"")
+
+	for k,v:=range codes{
+		fmt.Printf("%v : %v\n",k,v)
+	}
+
 }
 
 func TestHeap(t *testing.T) {
@@ -29,7 +52,7 @@ func TestHeap(t *testing.T) {
 		}
 		heap.Push(th, tree1)
 	}
-	expectedList := []int{10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
+	expectedList := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	actualList := []int{}
 	for th.Len() > 0 {
 		t := heap.Pop(th)
