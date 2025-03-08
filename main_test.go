@@ -3,6 +3,7 @@ package main
 import (
 	"container/heap"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,24 +16,34 @@ func TestParsing(t *testing.T) {
 	assert.Equal(t, expectedMap, actualMap)
 }
 
+func TestParsingFromTxtFile(t *testing.T) {
+	file, err := os.ReadFile("t.txt")
+	assert.NoError(t, err, "error reading file")
+
+	expectedMap := map[rune]int{'X': 333, 't': 223000}
+	actualMap := parsing(string(file))
+	assert.Equal(t, expectedMap['X'], actualMap['X'])
+	assert.Equal(t, expectedMap['t'], actualMap['t'])
+}
+
 func TestTree(t *testing.T) {
 	str := "all is well"
 	mp := parsing(str)
 	th := &treeHeap{}
 	heap.Init(th)
 
-	makeTree(mp,th)
+	makeTree(mp, th)
 
 	codes := map[rune]string{}
 
 	rootany := heap.Pop(th)
 	root := rootany.(tree)
 
-	fmt.Printf("%v\n",string(root.root.rightnode.val))
-	root.preOrder(root.root,codes,"")
+	fmt.Printf("%v\n", string(root.root.rightnode.val))
+	root.preOrder(root.root, codes, "")
 
-	for k,v:=range codes{
-		fmt.Printf("%v : %v\n",k,v)
+	for k, v := range codes {
+		fmt.Printf("%v : %v\n", k, v)
 	}
 
 }
