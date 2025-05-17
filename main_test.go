@@ -73,3 +73,36 @@ func TestHeap(t *testing.T) {
 
 	assert.Equal(t, expectedList, actualList)
 }
+
+func TestPreOrder(t *testing.T) {
+	th := &treeHeap{}
+	heap.Init(th)
+
+	for i := 1; i <= 10; i++ {
+		root1 := node{
+			val:       rune(i),
+			frequency: i,
+			isLeaf:    true,
+			leftnode:  nil,
+			rightnode: nil,
+		}
+		tree1 := tree{
+			root: &root1,
+		}
+		heap.Push(th, tree1)
+	}
+
+	buildTree(th)
+
+	codes := map[rune]string{}
+
+	rootany := heap.Pop(th)
+	root := rootany.(tree)
+
+	root.preOrder(root.root, codes, "")
+
+	for k, v := range codes {
+		fmt.Printf("%v: %v\n", k, v)
+	}
+
+}
